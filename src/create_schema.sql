@@ -1,12 +1,12 @@
 CREATE TABLE Artist (
 	ArtistID int NOT NULL AUTO_INCREMENT,
-	Name varchar NOT NULL,
+	Name varchar(128) NOT NULL,
 	PRIMARY KEY (ArtistID)
 );
 
 CREATE TABLE Album (
 	ArtistID int NOT NULL,
-	Name varchar NOT NULL,
+	Name varchar(256) NOT NULL,
 	AlbumID int NOT NULL AUTO_INCREMENT,
 	PRIMARY KEY (AlbumID)
 );
@@ -20,7 +20,7 @@ CREATE TABLE Recommendation (
 
 CREATE TABLE User (
 	UserID int NOT NULL AUTO_INCREMENT,
-	Name varchar NOT NULL,
+	Name varchar(64) NOT NULL,
 	HashedPassword char(64) NOT NULL,
 	PRIMARY KEY (UserID)
 );
@@ -29,14 +29,14 @@ CREATE TABLE Song (
 	SongID int NOT NULL AUTO_INCREMENT,
 	AlbumID int NOT NULL,
 	AlbumIndex int NOT NULL,
-	Name varchar NOT NULL,
+	Name varchar(256) NOT NULL,
 	PRIMARY KEY (SongID)
 );
 
 CREATE TABLE Playlist (
 	PlaylistID int NOT NULL AUTO_INCREMENT,
 	UserID int NOT NULL,
-	Name varchar NOT NULL,
+	Name varchar(256) NOT NULL,
 	PRIMARY KEY (PlaylistID)
 );
 
