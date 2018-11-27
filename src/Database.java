@@ -11,7 +11,7 @@ public class Database {
     public static Connection getConnection() {
         if (mysqlConnection == null) {
             try {
-                mysqlConnection = DriverManager.getConnection("jdbc:mysql://localhost:3306/cpsc408_final", "dbmanager", "password");
+                mysqlConnection = DriverManager.getConnection("jdbc:mysql://localhost:3306/cpsc408_final?useSSL=false", "dbmanager", "password");
             } catch (SQLException ex) {
                 System.out.println("Database.java: getConnection failed to create a connection.");
                 System.out.println(ex.toString());
@@ -50,15 +50,52 @@ public class Database {
         }
     }
 
+    public static String in_array(int amount) {
+        String out = "";
+
+        for (int i = 0; i < amount; ++i) {
+
+            if (i > 0) {
+                out = out + ",";
+            }
+
+            out = out + "?";
+
+        }
+
+        return "(" + out + ")";
+    }
+
     public static ArrayList<Artist> getArtistsByIDs(Integer[] ids) {
         try {
-            PreparedStatement stmt = getConnection().prepareStatement("SELECT * FROM Artist WHERE ArtistID IN ?");
-            Array array = getConnection().createArrayOf("INT", ids);
-            stmt.setArray(1, array);
+            //Before I get yelled at for dynamically generating SQL queries, I'm doing so because there is no way to
+            //  cleanly use arrays in prepared statements for an IN clause.
+            PreparedStatement stmt = getConnection().prepareStatement("SELECT * FROM Artist WHERE ArtistID IN " + in_array(ids.length));
+
+            for (int i = 0; i < ids.length; ++i) {
+                stmt.setInt(i+1, ids[i]);
+            }
+
             ResultSet rs = stmt.executeQuery();
             return resultSetToList(rs);
         } catch (SQLException ex) {
             System.out.println("Database.java: Could not get artists by IDs.");
+            System.out.println(ex.toString());
+            return new ArrayList<Artist>();
+        }
+    }
+
+    public static ArrayList<Artist> findArtistByName(String name) {
+        try {
+            PreparedStatement stmt = getConnection().prepareStatement("SELECT * FROM Artist WHERE Name LIKE ?");
+            stmt.setString(1, "%"+name+"%");
+
+            ResultSet rs = stmt.executeQuery();
+            return resultSetToList(rs);
+
+        } catch (SQLException ex) {
+            System.out.println("Database.java: Could not get artists by name.");
+            System.out.println(ex.toString());
             return new ArrayList<Artist>();
         }
     }
