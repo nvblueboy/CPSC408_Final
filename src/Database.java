@@ -77,7 +77,7 @@ public class Database {
             }
 
             ResultSet rs = stmt.executeQuery();
-            return resultSetToList(rs);
+            return resultSetToArtistList(rs);
         } catch (SQLException ex) {
             System.out.println("Database.java: Could not get artists by IDs.");
             System.out.println(ex.toString());
@@ -91,7 +91,7 @@ public class Database {
             stmt.setString(1, "%"+name+"%");
 
             ResultSet rs = stmt.executeQuery();
-            return resultSetToList(rs);
+            return resultSetToArtistList(rs);
 
         } catch (SQLException ex) {
             System.out.println("Database.java: Could not get artists by name.");
@@ -100,18 +100,37 @@ public class Database {
         }
     }
 
+    public static ArrayList<SearchResult> genericSearch(String query) {
+        try {
+            PreparedStatement stmt = getConnection().prepareStatement("SELECT a.ArtistID, a.Name, ab.AlbumID, ab.Name, s.SongID, s.Name, s.AlbumIndex FROM artist a, album ab, song s WHERE ab.ArtistID = a.ArtistID AND s.AlbumID = ab.AlbumID AND (a.Name LIKE ? OR s.Name LIKE ? OR ab.Name LIKE ?) ORDER BY a.Name, ab.Name, AlbumIndex");
+            String searchQuery = "%" + query + "%";
+            stmt.setString(1, searchQuery);
+            stmt.setString(2, searchQuery);
+            stmt.setString(3, searchQuery);
+
+            ResultSet rs = stmt.executeQuery();
+            return resultSetToSearchResultList(rs);
+
+        } catch (SQLException ex) {
+            System.out.println("Database.java: Could not get search results.");
+            System.out.println(ex.toString());
+            return new ArrayList<SearchResult>();
+        }
+    }
+
+
     public static ArrayList<Artist> getAllArtists() {
         try {
             PreparedStatement stmt = getConnection().prepareStatement("SELECT * FROM Artist");
             ResultSet rs = stmt.executeQuery();
-            return resultSetToList(rs);
+            return resultSetToArtistList(rs);
         } catch (SQLException ex) {
             System.out.println("Database.java: Could not get all artists.");
             return new ArrayList<Artist>();
         }
     }
 
-    public static ArrayList<Artist> resultSetToList(ResultSet rs) {
+    public static ArrayList<Artist> resultSetToArtistList(ResultSet rs) {
         ArrayList<Artist> artistList = new ArrayList<Artist>();
 
         try {
@@ -124,5 +143,20 @@ public class Database {
         }
 
         return artistList;
+    }
+
+    public static ArrayList<SearchResult> resultSetToSearchResultList(ResultSet rs) {
+        ArrayList<SearchResult> resultList = new ArrayList<SearchResult>();
+
+        try {
+            while (rs.next()) {
+                SearchResult r = new SearchResult(rs);
+                resultList.add(r);
+            }
+        } catch (SQLException ex) {
+            System.out.println("Database.java: Could not convert ResultSet to ArrayList.");
+        }
+
+        return resultList;
     }
 }
