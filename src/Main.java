@@ -66,16 +66,23 @@ public class Main {
 
             choice = Input.getInt("Please type the number you'd like to go to.");
 
-            if (choice == 1) {
-                displayPlaylist();
-            } else if (choice == 2) {
-                searchPlaylists();
-            } else if (choice == 3) {
-                createPlaylist();
-            } else if (choice == 4) {
-                addToPlaylist();
-            } else if (choice == 5) {
-                deletePlaylist();
+            switch(choice) {
+                case 1:
+                    displayPlaylist();
+                    break;
+                case 2:
+                    searchPlaylists();
+                    break;
+                case 3:
+                    createPlaylist();
+                    break;
+                case 4:
+                    addToPlaylist();
+                    break;
+                case 5:
+                    deletePlaylist();
+                    break;
+                default: break;
             }
         }
     }
