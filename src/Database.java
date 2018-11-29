@@ -120,6 +120,21 @@ public class Database {
         }
     }
 
+    public static ArrayList<SearchResult> getSongsFromPlaylist(int playlistId) {
+        try {
+            PreparedStatement stmt = getConnection().prepareStatement("SELECT a.ArtistID, a.Name, ab.AlbumID, ab.Name, s.SongID, s.Name, s.AlbumIndex FROM artist a, album ab, song s, playlist p, playlistsong ps WHERE ab.ArtistID = a.ArtistID AND s.AlbumID = ab.AlbumID AND ps.PlaylistId = ? AND ps.SongID = s.SongId ORDER BY a.Name, ab.Name, AlbumIndex");
+            stmt.setInt(1, playlistId);
+
+            ResultSet rs = stmt.executeQuery();
+            return resultSetToSearchResultList(rs);
+
+        } catch (SQLException ex) {
+            System.out.println("Database.java: Could not get playlist songs.");
+            System.out.println(ex.toString());
+            return new ArrayList<SearchResult>();
+        }
+    }
+
 
     public static ArrayList<Artist> getAllArtists() {
         try {
@@ -161,6 +176,7 @@ public class Database {
         }
 
         return resultList;
+    }
       
    public static ArrayList<User> resultSetToUserList(ResultSet rs) {
         ArrayList<User> userList = new ArrayList<>();
