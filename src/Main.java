@@ -3,13 +3,15 @@ import com.google.protobuf.ByteString;
 import java.util.ArrayList;
 
 public class Main {
+    static int userId;
+
     public static void main(String[] argv) {
         //Handle log-in here.
 
 
 
         //After user is logged in...
-        int userId = 1; //Once the user is logged in, set their user id to this.
+        userId = 1; //Once the user is logged in, set their user id to this.
         int choice = -1;
 
         while (choice != 0) {
@@ -37,7 +39,7 @@ public class Main {
     public static void searchSongs() {
         ArrayList<SearchResult> results = Database.genericSearch(Input.getString("What search term would you like to search for? Can be artist, song, or album."));
 
-        System.out.println("Search results: ");1
+        System.out.println("Search results: ");
         System.out.println(Output_Utilities.prettyPrint(results));
     }
 
@@ -48,7 +50,8 @@ public class Main {
             System.out.println("  0. Main Menu");
             System.out.println("  1. View a playlist");
             System.out.println("  2. Find a playlist");
-            System.out.println("  3. Add to a playlist");
+            System.out.println("  3. Create a playlist");
+            System.out.println("  4. Add to a playlist");
 
             choice = Input.getInt("Please type the number you'd like to go to.");
 
@@ -57,6 +60,8 @@ public class Main {
             } else if (choice == 2) {
                 searchPlaylists();
             } else if (choice == 3) {
+                createPlaylist();
+            } else if (choice == 4) {
                 addToPlaylist();
             }
         }
@@ -82,6 +87,10 @@ public class Main {
         checkForSongId();
         int songId = Input.getInt("What is the song ID?");
         Database.addSongToPlaylist(playlistId, songId);
+    }
+
+    public static void createPlaylist() {
+        System.out.println("Created " + Database.createPlaylist(Input.getString("What is the playlist name?"), userId).toString());
     }
 
     public static void checkForPlaylistId() {

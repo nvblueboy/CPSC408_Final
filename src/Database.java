@@ -136,7 +136,7 @@ public class Database {
 
     public static ArrayList<SearchResult> getSongsFromPlaylist(int playlistId) {
         try {
-            PreparedStatement stmt = getConnection().prepareStatement("SELECT a.ArtistID, a.Name, ab.AlbumID, ab.Name, s.SongID, s.Name, s.AlbumIndex FROM artist a, album ab, song s, playlist p, playlistsong ps WHERE ab.ArtistID = a.ArtistID AND s.AlbumID = ab.AlbumID AND ps.PlaylistId = ? AND ps.SongID = s.SongId ORDER BY a.Name, ab.Name, AlbumIndex");
+            PreparedStatement stmt = getConnection().prepareStatement("SELECT a.ArtistID, a.Name, ab.AlbumID, ab.Name, s.SongID, s.Name, s.AlbumIndex FROM artist a, album ab, song s, playlistsong ps WHERE ab.ArtistID = a.ArtistID AND s.AlbumID = ab.AlbumID AND ps.PlaylistId = ? AND ps.SongID = s.SongId ORDER BY a.Name, ab.Name, AlbumIndex");
             stmt.setInt(1, playlistId);
 
             ResultSet rs = stmt.executeQuery();
@@ -149,13 +149,32 @@ public class Database {
         }
     }
 
+    public static Playlist getPlaylistById(int playlistId) {
+        try {
+            PreparedStatement stmt = getConnection().prepareStatement("SELECT * FROM Playlist WHERE PlaylistId = ?");
+            stmt.setInt(1, playlistId);
+
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return new Playlist(rs);
+            } else {
+                return new Playlist();
+            }
+        } catch (SQLException ex) {
+            System.out.println("Database.java: Could not get playlist by Id.");
+            System.out.println(ex.toString());
+            return new Playlist();
+        }
+    }
+
     public static void addSongToPlaylist(int playlistId, int songId) {
         try {
             PreparedStatement stmt = getConnection().prepareStatement("INSERT INTO playlistsong (PlaylistId, SongID) VALUES (?, ?)");
             stmt.setInt(1, playlistId);
             stmt.setInt(2, songId);
 
-            stmt.execute();
+            stmt.executeUpdate();
+
             return;
         } catch (SQLException ex) {
             System.out.println("Database.java: Could not add song to playlist.");
@@ -164,8 +183,28 @@ public class Database {
         }
     }
 
-    public static void createPlaylist() {
+    public static Playlist createPlaylist(String name, int UserID) {
+        try {
+            PreparedStatement stmt = getConnection().prepareStatement("INSERT INTO Playlist (Name, UserID) VALUES (?, ?)", Statement.RETURN_GENERATED_KEYS);
+            stmt.setString(1, name);
+            stmt.setInt(2, UserID);
 
+            stmt.execute();
+
+            ResultSet rs = stmt.getGeneratedKeys();
+
+            if (rs.next()) {
+                Playlist p = getPlaylistById(rs.getInt(1));
+                return p;
+            } else {
+                return new Playlist();
+            }
+
+        } catch (SQLException ex) {
+            System.out.println("Database.java: Could not create playlist.");
+            System.out.println(ex.toString());
+            return new Playlist();
+        }
     }
 
 
