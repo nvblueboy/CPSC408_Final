@@ -20,11 +20,24 @@ public class Main {
 
             choice = Input.getInt("Please type the number you'd like to go to.");
 
-            if (choice == 1) {
-                searchArtists(); //This function does not modify the database in any way.
-            } else if (choice == 2) {
-                playlistMenu();
+            switch (choice) {
+                case 1:
+                    searchArtists();
+                    break;
+                case 2:
+                    playlistMenu();
+                    break;
+                case 3:
+                    userMenu();
+                    break;
+                default: break;
             }
+
+            // if (choice == 1) {
+            //     searchArtists(); //This function does not modify the database in any way.
+            // } else if (choice == 2) {
+            //     playlistMenu();
+            // }
 
         }
         //Leave this code at the end to wrap up execution.
@@ -58,5 +71,26 @@ public class Main {
         ArrayList<SearchResult> results = Database.getSongsFromPlaylist(Input.getInt("Please input the playlist ID you'd like to display."));
 
         System.out.println(Output_Utilities.prettyPrint(results));
+    }
+
+    public static void userMenu() {
+        System.out.println("Welcome!");
+        System.out.println("  1. Create new user");
+        System.out.println("  2. Log in\n");
+
+        while (true) {
+            int choice = Input.getInt("Please enter your choice.");
+
+            switch (choice) {
+                case 1:
+                    Database.createNewUser();
+                    break;
+                case 2:
+                    Database.checkIfUserExists();
+                    break;
+                default: continue;
+            }
+        }
+
     }
 }
