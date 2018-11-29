@@ -149,6 +149,29 @@ public class Database {
         }
     }
 
+    public static void deletePlaylist(int playlistId) {
+        try {
+            getConnection().setAutoCommit(false);
+            PreparedStatement pl_stmt = getConnection().prepareStatement("DELETE FROM Playlist WHERE PlaylistID = ?");
+            pl_stmt.setInt(1, playlistId);
+
+            PreparedStatement pls_stmt = getConnection().prepareStatement("DELETE FROM PlaylistSong WHERE PlaylistId = ?");
+            pls_stmt.setInt(1, playlistId);
+
+            pls_stmt.executeUpdate();
+            pl_stmt.executeUpdate();
+
+
+            getConnection().commit();
+
+            getConnection().setAutoCommit(true);
+        } catch (SQLException ex) {
+            System.out.println("Database.java: Could not delete playlist.");
+            System.out.println(ex.toString());
+
+        }
+    }
+
     public static Playlist getPlaylistById(int playlistId) {
         try {
             PreparedStatement stmt = getConnection().prepareStatement("SELECT * FROM Playlist WHERE PlaylistId = ?");

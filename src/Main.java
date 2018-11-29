@@ -52,6 +52,7 @@ public class Main {
             System.out.println("  2. Find a playlist");
             System.out.println("  3. Create a playlist");
             System.out.println("  4. Add to a playlist");
+            System.out.println("  5. Delete a playlist");
 
             choice = Input.getInt("Please type the number you'd like to go to.");
 
@@ -63,6 +64,8 @@ public class Main {
                 createPlaylist();
             } else if (choice == 4) {
                 addToPlaylist();
+            } else if (choice == 5) {
+                deletePlaylist();
             }
         }
     }
@@ -93,8 +96,13 @@ public class Main {
         System.out.println("Created " + Database.createPlaylist(Input.getString("What is the playlist name?"), userId).toString());
     }
 
+    public static void deletePlaylist() {
+        checkForPlaylistId();
+        Database.deletePlaylist(Input.getInt("What is the playlist ID you want to delete?"));
+    }
+
     public static void checkForPlaylistId() {
-        while (!Input.getBoolean("Do you know the ID of the playlist you're adding to (y/n)?")) {
+        while (!Input.getBoolean("Do you know the ID of the playlist (y/n)?")) {
             searchPlaylists();
         }
     }
