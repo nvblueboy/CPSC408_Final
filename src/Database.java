@@ -1,3 +1,4 @@
+import java.net.UnknownServiceException;
 import java.sql.*;
 import java.util.ArrayList;
 
@@ -206,6 +207,46 @@ public class Database {
         }
     }
 
+    public static void removeSongFromPlaylist(int playlistId, int songId) {
+        try {
+            PreparedStatement stmt = getConnection().prepareStatement("DELETE FROM Playlistsong WHERE PlaylistId = ? AND SongId = ?");
+            stmt.setInt(1, playlistId);
+            stmt.setInt(2, songId);
+
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            System.out.println("Database.java: could not remove song from playlist.");
+            System.out.println(ex.toString());
+        }
+    }
+
+    public static void renamePlaylist(int playlistId, String name) {
+        try{
+            PreparedStatement stmt = getConnection().prepareStatement("UPDATE Playlist SET Name = ? WHERE PlaylistId = ?");
+            stmt.setString(1, name);
+            stmt.setInt(2, playlistId);
+
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            System.out.println("Database.java: could not rename playlist");
+            System.out.println(ex.toString());
+        }
+    }
+
+    public static ArrayList<Playlist> getUserPlaylists(int UserId) {
+        try {
+            PreparedStatement stmt = getConnection().prepareStatement("SELECT * FROM Playlist WHERE UserId = ?");
+            stmt.setInt(1, UserId);
+
+            ResultSet rs = stmt.executeQuery();
+            return resultSetToPlaylistList(rs);
+        } catch (SQLException ex) {
+            System.out.println("Database.java: Could not get a user's playlists.");
+            System.out.println(ex.toString());
+            return new ArrayList<Playlist>();
+        }
+    }
+
     public static Playlist createPlaylist(String name, int UserID) {
         try {
             PreparedStatement stmt = getConnection().prepareStatement("INSERT INTO Playlist (Name, UserID) VALUES (?, ?)", Statement.RETURN_GENERATED_KEYS);
@@ -332,8 +373,9 @@ public class Database {
             } else {
                 // TODO: Get user's ID
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             System.out.println("Database.java: Could not validate user data.");
+            System.out.println(e.toString());
         }
 
         return -1;
@@ -342,11 +384,15 @@ public class Database {
     public static void createNewUser() {
         String name = Input.getString("Enter your name:");
         String pass = Input.getString("Create a password:");
-        
-        PreparedStatement stmt = getConnection().prepareStatement("INSERT INTO TABLE User(Name, HashedPassword) VALUES(?, ?)");
-        stmt.setString(1, name);
-        stmt.setString(2, pass);
-        stmt.executeUpdate();
+        try {
+            PreparedStatement stmt = getConnection().prepareStatement("INSERT INTO TABLE User(Name, HashedPassword) VALUES(?, ?)");
+            stmt.setString(1, name);
+            stmt.setString(2, pass);
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            System.out.println("Database.java: Couldn't create user.");
+            System.out.println(ex.toString());
+        }
 
         // TODO: Return new user's ID
     }

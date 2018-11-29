@@ -56,13 +56,16 @@ public class Main {
     public static void playlistMenu() {
         int choice = -1;
         while (choice != 0) {
-            System.out.println("Playlist menu: ");
+            System.out.println("\n\nPlaylist menu: ");
             System.out.println("  0. Main Menu");
             System.out.println("  1. View a playlist");
             System.out.println("  2. Find a playlist");
             System.out.println("  3. Create a playlist");
             System.out.println("  4. Add to a playlist");
             System.out.println("  5. Delete a playlist");
+            System.out.println("  6. Delete a song from a playlist");
+            System.out.println("  7. Rename a playlist");
+            System.out.println("  8. View all your playlists");
 
             choice = Input.getInt("Please type the number you'd like to go to.");
 
@@ -81,6 +84,15 @@ public class Main {
                     break;
                 case 5:
                     deletePlaylist();
+                    break;
+                case 6:
+                    removeFromPlaylist();
+                    break;
+                case 7:
+                    renamePlaylist();
+                    break;
+                case 8:
+                    viewAllPlaylists();
                     break;
                 default: break;
             }
@@ -109,6 +121,21 @@ public class Main {
         Database.addSongToPlaylist(playlistId, songId);
     }
 
+    public static void removeFromPlaylist() {
+        checkForPlaylistId();
+        int playlistId = Input.getInt("What is the playlist ID?");
+        checkForSongId();
+        int songId = Input.getInt("What is the song ID?");
+        Database.removeSongFromPlaylist(playlistId, songId);
+    }
+
+    public static void renamePlaylist() {
+        checkForPlaylistId();
+        int playlistId = Input.getInt("What is the playlist ID?");
+        String name = Input.getString("What would you like to rename the playlist to?");
+        Database.renamePlaylist(playlistId, name);
+    }
+
     public static void createPlaylist() {
         System.out.println("Created " + Database.createPlaylist(Input.getString("What is the playlist name?"), userId).toString());
     }
@@ -118,6 +145,12 @@ public class Main {
         Database.deletePlaylist(Input.getInt("What is the playlist ID you want to delete?"));
     }
 
+    public static void viewAllPlaylists() {
+        for (Playlist p : Database.getUserPlaylists(userId)) {
+            System.out.println(p.toString());
+        }
+    }
+
     public static void checkForPlaylistId() {
         while (!Input.getBoolean("Do you know the ID of the playlist (y/n)?")) {
             searchPlaylists();
@@ -125,7 +158,7 @@ public class Main {
     }
 
     public static void checkForSongId() {
-        while (!Input.getBoolean("Do you know the ID of the song you're adding (y/n)?")) {
+        while (!Input.getBoolean("Do you know the ID of the song (y/n)?")) {
             searchSongs();
         }
     }
