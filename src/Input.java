@@ -12,6 +12,12 @@ public class Input {
         return scanner;
     }
 
+    public static void closeScanner() {
+        if (scanner != null) {
+            scanner.close();
+        }
+    }
+
     public static String getString(String prompt) {
         System.out.println(prompt);
         String out = getScanner().nextLine();
