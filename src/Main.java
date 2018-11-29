@@ -21,7 +21,7 @@ public class Main {
             choice = Input.getInt("Please type the number you'd like to go to.");
 
             if (choice == 1) {
-                searchArtists(); //This function does not modify the database in any way.
+                searchSongs(); //This function does not modify the database in any way.
             } else if (choice == 2) {
                 playlistMenu();
             }
@@ -29,13 +29,15 @@ public class Main {
         }
         //Leave this code at the end to wrap up execution.
         Database.closeConnection();
+        Input.closeScanner();
 
         System.out.println("Goodbye.");
     }
 
-    public static void searchArtists() {
+    public static void searchSongs() {
         ArrayList<SearchResult> results = Database.genericSearch(Input.getString("What search term would you like to search for? Can be artist, song, or album."));
 
+        System.out.println("Search results: ");1
         System.out.println(Output_Utilities.prettyPrint(results));
     }
 
@@ -45,11 +47,17 @@ public class Main {
             System.out.println("Playlist menu: ");
             System.out.println("  0. Main Menu");
             System.out.println("  1. View a playlist");
+            System.out.println("  2. Find a playlist");
+            System.out.println("  3. Add to a playlist");
 
             choice = Input.getInt("Please type the number you'd like to go to.");
 
             if (choice == 1) {
                 displayPlaylist();
+            } else if (choice == 2) {
+                searchPlaylists();
+            } else if (choice == 3) {
+                addToPlaylist();
             }
         }
     }
@@ -58,5 +66,33 @@ public class Main {
         ArrayList<SearchResult> results = Database.getSongsFromPlaylist(Input.getInt("Please input the playlist ID you'd like to display."));
 
         System.out.println(Output_Utilities.prettyPrint(results));
+    }
+
+    public static void searchPlaylists() {
+        ArrayList<Playlist> results = Database.findPlaylistsByName(Input.getString("What search term would you like to look for?"));
+
+        for (Playlist p : results) {
+            System.out.println(p.toString());
+        }
+    }
+
+    public static void addToPlaylist() {
+        checkForPlaylistId();
+        int playlistId = Input.getInt("What is the playlist ID?");
+        checkForSongId();
+        int songId = Input.getInt("What is the song ID?");
+        Database.addSongToPlaylist(playlistId, songId);
+    }
+
+    public static void checkForPlaylistId() {
+        while (!Input.getBoolean("Do you know the ID of the playlist you're adding to (y/n)?")) {
+            searchPlaylists();
+        }
+    }
+
+    public static void checkForSongId() {
+        while (!Input.getBoolean("Do you know the ID of the song you're adding (y/n)?")) {
+            searchSongs();
+        }
     }
 }

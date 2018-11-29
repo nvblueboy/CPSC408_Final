@@ -120,6 +120,20 @@ public class Database {
         }
     }
 
+    public static ArrayList<Playlist> findPlaylistsByName(String query) {
+        try {
+            PreparedStatement stmt = getConnection().prepareStatement("SELECT * FROM Playlist WHERE Name LIKE ?");
+            stmt.setString(1, "%"+query+"%");
+
+            ResultSet rs = stmt.executeQuery();
+            return resultSetToPlaylistList(rs);
+        } catch (SQLException ex) {
+            System.out.println("Database.java: Could not find playlists.");
+            System.out.println(ex.toString());
+            return new ArrayList<Playlist>();
+        }
+    }
+
     public static ArrayList<SearchResult> getSongsFromPlaylist(int playlistId) {
         try {
             PreparedStatement stmt = getConnection().prepareStatement("SELECT a.ArtistID, a.Name, ab.AlbumID, ab.Name, s.SongID, s.Name, s.AlbumIndex FROM artist a, album ab, song s, playlist p, playlistsong ps WHERE ab.ArtistID = a.ArtistID AND s.AlbumID = ab.AlbumID AND ps.PlaylistId = ? AND ps.SongID = s.SongId ORDER BY a.Name, ab.Name, AlbumIndex");
@@ -133,6 +147,25 @@ public class Database {
             System.out.println(ex.toString());
             return new ArrayList<SearchResult>();
         }
+    }
+
+    public static void addSongToPlaylist(int playlistId, int songId) {
+        try {
+            PreparedStatement stmt = getConnection().prepareStatement("INSERT INTO playlistsong (PlaylistId, SongID) VALUES (?, ?)");
+            stmt.setInt(1, playlistId);
+            stmt.setInt(2, songId);
+
+            stmt.execute();
+            return;
+        } catch (SQLException ex) {
+            System.out.println("Database.java: Could not add song to playlist.");
+            System.out.println(ex.toString());
+            return;
+        }
+    }
+
+    public static void createPlaylist() {
+
     }
 
 
@@ -160,6 +193,21 @@ public class Database {
         }
 
         return artistList;
+    }
+
+    public static ArrayList<Playlist> resultSetToPlaylistList(ResultSet rs) {
+        ArrayList<Playlist> playlistList = new ArrayList<Playlist>();
+
+        try {
+            while (rs.next()) {
+                Playlist p = new Playlist(rs);
+                playlistList.add(p);
+            }
+        } catch (SQLException ex) {
+            System.out.println("Database.java: Could not convert ResultSet to ArrayList.");
+        }
+
+        return playlistList;
     }
 
 
