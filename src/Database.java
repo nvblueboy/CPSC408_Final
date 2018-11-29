@@ -313,22 +313,41 @@ public class Database {
         }
     }
 
-    public static boolean validateUser(String name, String hashedPass) {
+    public static int checkIfUserExists() {
+        String name = Input.getString("Enter your name:");
+        String pass = Input.getString("Enter your password:");
+
         try {
             PreparedStatement stmt = getConnection().prepareStatement("SELECT * FROM User WHERE Name=? AND HashedPassword=?");
             stmt.setString(1, name);
-            stmt.setString(2, hashedPass);
+            stmt.setString(2, pass);
             ResultSet rs = stmt.executeQuery();
 
             if (rs.next() == false) {
-                System.out.println("Database.java: Invalid user credentials.");
-                return false;
+                boolean wantToCreateUser = Input.getBoolean("User does not exist.\n\nWould you like to create one? (y/n)");
+
+                if (wantToCreateUser) {
+                    createNewUser();
+                }
+            } else {
+                // TODO: Get user's ID
             }
         } catch (Exception e) {
             System.out.println("Database.java: Could not validate user data.");
-            return false;
         }
 
-        return true;
+        return -1;
+    }
+
+    public static void createNewUser() {
+        String name = Input.getString("Enter your name:");
+        String pass = Input.getString("Create a password:");
+        
+        PreparedStatement stmt = getConnection().prepareStatement("INSERT INTO TABLE User(Name, HashedPassword) VALUES(?, ?)");
+        stmt.setString(1, name);
+        stmt.setString(2, pass);
+        stmt.executeUpdate();
+
+        // TODO: Return new user's ID
     }
 }
