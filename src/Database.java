@@ -2,6 +2,8 @@ import java.net.UnknownServiceException;
 import java.sql.*;
 import java.util.ArrayList;
 
+import javax.xml.transform.Result;
+
 public class Database {
     private static Connection mysqlConnection;
 
@@ -340,6 +342,7 @@ public class Database {
         } catch (SQLException ex) {
             System.out.println("Database.java: Could not convert ResultSet to ArrayList.");
         }
+        
         return userList;
     }
 
@@ -354,7 +357,8 @@ public class Database {
         }
     }
 
-    public static int checkIfUserExists() {
+    public static User checkIfUserExists() {
+        User u = new User();
         String name = Input.getString("Enter your name:");
         String pass = Input.getString("Enter your password:");
 
@@ -368,32 +372,77 @@ public class Database {
                 boolean wantToCreateUser = Input.getBoolean("User does not exist.\n\nWould you like to create one? (y/n)");
 
                 if (wantToCreateUser) {
-                    createNewUser();
+                    u = createNewUser();
                 }
             } else {
-                // TODO: Get user's ID
+                u = new User(rs);
             }
         } catch (SQLException e) {
             System.out.println("Database.java: Could not validate user data.");
             System.out.println(e.toString());
         }
 
-        return -1;
+        return u;
     }
 
-    public static void createNewUser() {
+    public static User createNewUser() {
         String name = Input.getString("Enter your name:");
         String pass = Input.getString("Create a password:");
+
         try {
-            PreparedStatement stmt = getConnection().prepareStatement("INSERT INTO TABLE User(Name, HashedPassword) VALUES(?, ?)");
+            PreparedStatement stmt = getConnection().prepareStatement("INSERT INTO User(Name, HashedPassword) VALUES(?, ?)", Statement.RETURN_GENERATED_KEYS);
             stmt.setString(1, name);
             stmt.setString(2, pass);
-            stmt.executeUpdate();
+
+            stmt.execute();
+
+            ResultSet rs = stmt.getGeneratedKeys();
+
+            if (rs.next()) {
+                User u = getUserById(rs.getInt(1));
+                return u;
+            } else {
+                return new User();
+            }
+
         } catch (SQLException ex) {
-            System.out.println("Database.java: Couldn't create user.");
+            System.out.println("Database.java: Could not create user.");
             System.out.println(ex.toString());
+            return new User();
+        }
+    }
+
+    private static User getUserById(int userId) {
+        try {
+            PreparedStatement stmt = getConnection().prepareStatement("SELECT * FROM User WHERE UserID = ?");
+            stmt.setInt(1, userId);
+
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                return new User(rs);
+            } else {
+                return new User();
+            }
+        } catch (SQLException ex) {
+            System.out.println("Database.java: Could not get user by Id.");
+            System.out.println(ex.toString());
+            return new User();
+        }
+    }
+
+    private static int getIdOfLastUserRecord() {
+        int idOfResult = -1;
+        String sql = "SELECT * FROM User ORDER BY UserID DESC LIMIT 1;";
+
+        try {
+            PreparedStatement stmt = getConnection().prepareStatement(sql);
+            ResultSet rs = stmt.executeQuery();
+            idOfResult = resultSetToUserList(rs).get(0).getUserID();
+        } catch (Exception e) {
+            System.out.println("Database.java: Could not get user id.");
         }
 
-        // TODO: Return new user's ID
+        return idOfResult;
     }
 }

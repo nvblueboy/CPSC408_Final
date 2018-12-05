@@ -6,12 +6,7 @@ public class Main {
     static int userId;
 
     public static void main(String[] argv) {
-        //Handle log-in here.
-
-
-
-        //After user is logged in...
-        userId = 1; //Once the user is logged in, set their user id to this.
+        userId = userMenu();
         int choice = -1;
 
         while (choice != 0) {
@@ -30,14 +25,8 @@ public class Main {
                 case 2:
                     playlistMenu();
                     break;
-                case 3:
-                    userMenu();
-                    break;
                 default: break;
             }
-
-
-
         }
         //Leave this code at the end to wrap up execution.
         Database.closeConnection();
@@ -163,23 +152,26 @@ public class Main {
         }
     }
 
-    public static void userMenu() {
+    public static int userMenu() {
         System.out.println("Welcome!");
         System.out.println("  1. Create new user");
         System.out.println("  2. Log in\n");
 
         while (true) {
             int choice = Input.getInt("Please enter your choice.");
+            User u = new User();
 
             switch (choice) {
                 case 1:
-                    Database.createNewUser();
+                    u = Database.createNewUser();
                     break;
                 case 2:
-                    Database.checkIfUserExists();
+                    u = Database.checkIfUserExists();
                     break;
                 default: continue;
             }
+
+            return u.getUserID();
         }
     }
 }
