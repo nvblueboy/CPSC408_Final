@@ -430,19 +430,4 @@ public class Database {
             return new User();
         }
     }
-
-    private static int getIdOfLastUserRecord() {
-        int idOfResult = -1;
-        String sql = "SELECT * FROM User ORDER BY UserID DESC LIMIT 1;";
-
-        try {
-            PreparedStatement stmt = getConnection().prepareStatement(sql);
-            ResultSet rs = stmt.executeQuery();
-            idOfResult = resultSetToUserList(rs).get(0).getUserID();
-        } catch (Exception e) {
-            System.out.println("Database.java: Could not get user id.");
-        }
-
-        return idOfResult;
-    }
 }
