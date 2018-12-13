@@ -3,8 +3,10 @@
 ##### Vince Carpino and Dylan Bowman
 
 Dylan Bowman:\
-ID: 2250585 \
 Email: dbowman06@gmail.com
+
+Vince Carpino:\
+Email: 
 
 
 References: Lecture, Stack Overflow, Caffiene
