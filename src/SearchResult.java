@@ -21,7 +21,7 @@ public class SearchResult {
 
 
         try {
-            Song_Name = rs.getString(6);
+            Song_Name = rs.getString("SongName");
         } catch (SQLException ex) {
             System.out.println("SearchResult.java: Could not get Song_Name.");
         }
@@ -36,7 +36,7 @@ public class SearchResult {
         }
 
         try {
-            Album_Name = rs.getString(4);
+            Album_Name = rs.getString("AlbumName");
         } catch (SQLException ex) {
             System.out.println("SearchResult.java: Could not get Album_Name.");
         }
@@ -52,7 +52,7 @@ public class SearchResult {
 
 
         try {
-            Artist_Name = rs.getString(2);
+            Artist_Name = rs.getString("ArtistName");
         } catch (SQLException ex) {
             System.out.println("SearchResult.java: Could not get Artist_Name.");
         }
