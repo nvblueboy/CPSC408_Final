@@ -1,18 +1,18 @@
 ### CPSC408 Final Project
 #### A Playlist/Artist recommendation system for music
-##### Vince Carpino and Dylan Bowman
+##### Dylan Bowman and Vince Carpino
 
 Dylan Bowman:\
 Email: dbowman06@gmail.com
 
 Vince Carpino:\
-Email: 
+Email: carpi111@mail.chapman.edu
 
 
 References: Lecture, Stack Overflow, Caffiene
 
 
-#####To setup:
+##### To setup:
 - Run create_schema.sql in a MySQL Database to create the tables.
 - Using a data loader of your choice (we used MySQL Workbench) to load the following files, in order:
   - Smallartists.csv
