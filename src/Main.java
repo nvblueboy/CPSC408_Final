@@ -55,6 +55,7 @@ public class Main {
             System.out.println("  6. Delete a song from a playlist");
             System.out.println("  7. Rename a playlist");
             System.out.println("  8. View all your playlists");
+            System.out.println("  9. Get recommendations based on a playlist");
 
             choice = Input.getInt("Please type the number you'd like to go to.");
 
@@ -82,6 +83,9 @@ public class Main {
                     break;
                 case 8:
                     viewAllPlaylists();
+                    break;
+                case 9:
+                    getSongRecs();
                     break;
                 default: break;
             }
@@ -150,6 +154,13 @@ public class Main {
         while (!Input.getBoolean("Do you know the ID of the song (y/n)?")) {
             searchSongs();
         }
+    }
+
+    public static void getSongRecs() {
+        checkForPlaylistId();
+        ArrayList<SearchResult> results = Database.getSongRecs(Input.getInt("What is the playlist ID you'd like to get recommendations for?"));
+
+        System.out.println(Output_Utilities.prettyPrint(results));
     }
 
     public static int userMenu() {
