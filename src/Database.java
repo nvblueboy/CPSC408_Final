@@ -107,7 +107,7 @@ public class Database {
 
     public static ArrayList<SearchResult> genericSearch(String query) {
         try {
-            PreparedStatement stmt = getConnection().prepareStatement("SELECT a.ArtistID, a.Name, ab.AlbumID, ab.Name, s.SongID, s.Name, s.AlbumIndex FROM artist a, album ab, song s WHERE ab.ArtistID = a.ArtistID AND s.AlbumID = ab.AlbumID AND (a.Name LIKE ? OR s.Name LIKE ? OR ab.Name LIKE ?) ORDER BY a.Name, ab.Name, AlbumIndex");
+            PreparedStatement stmt = getConnection().prepareStatement("SELECT a.ArtistID, a.Name AS ArtistName, ab.AlbumID, ab.Name AS AlbumName, s.SongID, s.Name AS SongName, s.AlbumIndex FROM artist a, album ab, song s WHERE ab.ArtistID = a.ArtistID AND s.AlbumID = ab.AlbumID AND (a.Name LIKE ? OR s.Name LIKE ? OR ab.Name LIKE ?) ORDER BY a.Name, ab.Name, AlbumIndex");
             String searchQuery = "%" + query + "%";
             stmt.setString(1, searchQuery);
             stmt.setString(2, searchQuery);
@@ -139,7 +139,7 @@ public class Database {
 
     public static ArrayList<SearchResult> getSongsFromPlaylist(int playlistId) {
         try {
-            PreparedStatement stmt = getConnection().prepareStatement("SELECT a.ArtistID, a.Name, ab.AlbumID, ab.Name, s.SongID, s.Name, s.AlbumIndex FROM artist a, album ab, song s, playlistsong ps WHERE ab.ArtistID = a.ArtistID AND s.AlbumID = ab.AlbumID AND ps.PlaylistId = ? AND ps.SongID = s.SongId ORDER BY a.Name, ab.Name, AlbumIndex");
+            PreparedStatement stmt = getConnection().prepareStatement("SELECT  a.ArtistID, a.Name AS ArtistName, ab.AlbumID, ab.Name AS AlbumName, s.SongID, s.Name AS SongName, s.AlbumIndex FROM artist a, album ab, song s, playlistsong ps WHERE ab.ArtistID = a.ArtistID AND s.AlbumID = ab.AlbumID AND ps.PlaylistId = ? AND ps.SongID = s.SongId ORDER BY a.Name, ab.Name, AlbumIndex");
             stmt.setInt(1, playlistId);
 
             ResultSet rs = stmt.executeQuery();
@@ -428,6 +428,21 @@ public class Database {
             System.out.println("Database.java: Could not get user by Id.");
             System.out.println(ex.toString());
             return new User();
+        }
+    }
+
+    public static ArrayList<SearchResult> getSongRecs(int PlaylistId) {
+        try {
+            CallableStatement stmt = getConnection().prepareCall("{call getSuggestedSongs(?)}");
+            stmt.setInt(1,PlaylistId);
+
+            ResultSet rs = stmt.executeQuery();
+            return resultSetToSearchResultList(rs);
+
+        } catch (SQLException ex) {
+            System.out.println("Database.java: Could not get song recommendations.");
+            System.out.println(ex.toString());
+            return new ArrayList<SearchResult>();
         }
     }
 }
