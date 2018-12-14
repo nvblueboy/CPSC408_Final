@@ -1,5 +1,8 @@
 import com.google.protobuf.ByteString;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class Main {
@@ -14,6 +17,7 @@ public class Main {
             System.out.println("  0. Exit.");
             System.out.println("  1. Search the Database");
             System.out.println("  2. Playlist Utilities");
+            System.out.println("  3. Artist recommendations");
 
             choice = Input.getInt("Please type the number you'd like to go to.");
 
@@ -24,6 +28,9 @@ public class Main {
                     break;
                 case 2:
                     playlistMenu();
+                    break;
+                case 3:
+                    artistRecMenu();
                     break;
                 default: break;
             }
@@ -56,6 +63,7 @@ public class Main {
             System.out.println("  7. Rename a playlist");
             System.out.println("  8. View all your playlists");
             System.out.println("  9. Get recommendations based on a playlist");
+            System.out.println("  10. Export a playlist to CSV.");
 
             choice = Input.getInt("Please type the number you'd like to go to.");
 
@@ -86,6 +94,9 @@ public class Main {
                     break;
                 case 9:
                     getSongRecs();
+                    break;
+                case 10:
+                    exportPlaylist();
                     break;
                 default: break;
             }
@@ -161,6 +172,83 @@ public class Main {
         ArrayList<SearchResult> results = Database.getSongRecs(Input.getInt("What is the playlist ID you'd like to get recommendations for?"));
 
         System.out.println(Output_Utilities.prettyPrint(results));
+    }
+
+    public static void exportPlaylist() {
+        checkForPlaylistId();
+        ArrayList<SearchResult> results = Database.getSongsFromPlaylist(Input.getInt("What is the playlist ID you'd like to export?"));
+
+        String output = "Song Name,Artist Name, Album Name";
+
+        for (SearchResult result : results) {
+            output = output +"\n"+result.toCSVRow();
+        }
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter(Input.getString("Please enter the full path and filename for where you'd like to store the file.")));
+            writer.write(output);
+            writer.close();
+        } catch (IOException ex) {
+            System.out.println("Main.java: Could not write the file.");
+            System.out.println(ex.toString());
+        }
+    }
+
+    public static void artistRecMenu() {
+        int choice = -1;
+        while (choice != 0) {
+            System.out.println("\n\nArtist Recommendations");
+            System.out.println("  0. Main menu");
+            System.out.println("  1. Recommend an artist");
+            System.out.println("  2. Get an artist recommendation");
+
+            choice = Input.getInt("Please type the number you'd like to go to.");
+
+            switch(choice) {
+                case 1:
+                    makeRecommendation();
+                    break;
+                case 2:
+                    getRecommendations();
+                    break;
+                default: break;
+            }
+        }
+    }
+
+    public static void makeRecommendation() {
+        System.out.println("First, tell us the first artist you want to recommend from (e.g. If you like (this one), you'll like...");
+        checkForArtistId();
+        int id1 = Input.getInt("What is the ID of the artist you'd like to recommend from?");
+        System.out.println("Second, tell us the artist you want to recommend (e.g. If you like ... you'll like (this one)");
+        checkForArtistId();
+        int id2 = Input.getInt("What is the ID of the artist you'd like to recommend to?");
+
+        Database.createArtistRec(id1, id2, userId);
+    }
+
+    public static void getRecommendations() {
+        checkForArtistId();
+        int id = Input.getInt("What is the ID of the artist you'd like to get recommendations for?");
+
+        ArrayList<Artist> artists = Database.getArtistRecs(id);
+
+        for(Artist a : artists) {
+            System.out.println(a.toString());
+        }
+    }
+
+    public static void checkForArtistId() {
+        while(!Input.getBoolean("Do you know the ID of the artist?")) {
+            searchArtists();
+        }
+    }
+
+    public static void searchArtists() {
+        ArrayList<Artist> artists = Database.searchArtists(Input.getString("What would you like to search for?"));
+
+        for(Artist a : artists) {
+            System.out.println(a.toString());
+        }
     }
 
     public static int userMenu() {

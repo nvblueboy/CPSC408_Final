@@ -445,4 +445,46 @@ public class Database {
             return new ArrayList<SearchResult>();
         }
     }
+
+    public static ArrayList<Artist> searchArtists(String q) {
+        try {
+            PreparedStatement stmt = getConnection().prepareStatement("SELECT * FROM Artist WHERE Name LIKE ?");
+            stmt.setString(1, "%"+q+"%");
+
+            ResultSet rs = stmt.executeQuery();
+            return resultSetToArtistList(rs);
+        } catch (SQLException ex) {
+            System.out.println("Database.java: Could not search artists.");
+            System.out.println(ex.toString());
+            return new ArrayList<Artist>();
+        }
+    }
+
+    public static void createArtistRec(int id1, int id2, int userId) {
+        try {
+            PreparedStatement stmt = getConnection().prepareStatement("INSERT INTO Recommendation(FromArtist, ToArtist, UserID) VALUES (?,?,?)");
+            stmt.setInt(1, id1);
+            stmt.setInt(2, id2);
+            stmt.setInt(3,userId);
+
+            stmt.executeUpdate();
+        } catch(SQLException ex) {
+            System.out.println("Database.java: Could not create recommendation.");
+            System.out.println(ex.toString());
+        }
+    }
+
+    public static ArrayList<Artist> getArtistRecs(int id) {
+        try {
+            PreparedStatement stmt = getConnection().prepareStatement("SELECT * FROM Artist ar WHERE ar.ArtistId IN (SELECT ToArtist FROM Recommendation WHERE FromArtist = ? GROUP BY ToArtist, FromArtist ORDER BY Count(ToArtist) DESC)");
+            stmt.setInt(1, id);
+
+            ResultSet rs = stmt.executeQuery();
+            return resultSetToArtistList(rs);
+        } catch (SQLException ex) {
+            System.out.println("Database.java: Could not get artist recommendations.");
+            System.out.println(ex.toString());
+            return new ArrayList<>();
+        }
+    }
 }
