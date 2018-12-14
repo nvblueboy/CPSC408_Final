@@ -15,7 +15,7 @@ CREATE TABLE Recommendation (
 	FromArtist int NOT NULL,
 	ToArtist int NOT NULL,
 	UserID int NOT NULL,
-	PRIMARY KEY (FromArtist,ToArtist)
+	PRIMARY KEY (FromArtist,ToArtist,UserID)
 );
 
 CREATE TABLE User (
