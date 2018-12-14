@@ -1,5 +1,8 @@
 import com.google.protobuf.ByteString;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class Main {
@@ -60,6 +63,7 @@ public class Main {
             System.out.println("  7. Rename a playlist");
             System.out.println("  8. View all your playlists");
             System.out.println("  9. Get recommendations based on a playlist");
+            System.out.println("  10. Export a playlist to CSV.");
 
             choice = Input.getInt("Please type the number you'd like to go to.");
 
@@ -90,6 +94,9 @@ public class Main {
                     break;
                 case 9:
                     getSongRecs();
+                    break;
+                case 10:
+                    exportPlaylist();
                     break;
                 default: break;
             }
@@ -165,6 +172,25 @@ public class Main {
         ArrayList<SearchResult> results = Database.getSongRecs(Input.getInt("What is the playlist ID you'd like to get recommendations for?"));
 
         System.out.println(Output_Utilities.prettyPrint(results));
+    }
+
+    public static void exportPlaylist() {
+        checkForPlaylistId();
+        ArrayList<SearchResult> results = Database.getSongsFromPlaylist(Input.getInt("What is the playlist ID you'd like to export?"));
+
+        String output = "Song Name,Artist Name, Album Name";
+
+        for (SearchResult result : results) {
+            output = output +"\n"+result.toCSVRow();
+        }
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter(Input.getString("Please enter the full path and filename for where you'd like to store the file.")));
+            writer.write(output);
+            writer.close();
+        } catch (IOException ex) {
+            System.out.println("Main.java: Could not write the file.");
+            System.out.println(ex.toString());
+        }
     }
 
     public static void artistRecMenu() {

@@ -69,6 +69,10 @@ public class SearchResult {
 
     }
 
+    public String toCSVRow() {
+        return Song_Name + ","+Artist_Name+","+Album_Name;
+    }
+
     @Override
     public String toString() {
         return Song_Name + ", by " + Artist_Name + ", #"+Integer.toString(AlbumIndex) +" on " + Album_Name;
