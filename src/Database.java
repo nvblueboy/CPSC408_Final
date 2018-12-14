@@ -473,4 +473,18 @@ public class Database {
             System.out.println(ex.toString());
         }
     }
+
+    public static ArrayList<Artist> getArtistRecs(int id) {
+        try {
+            PreparedStatement stmt = getConnection().prepareStatement("SELECT * FROM Artist ar WHERE ar.ArtistId IN (SELECT ToArtist FROM Recommendation WHERE FromArtist = ? GROUP BY ToArtist, FromArtist ORDER BY Count(ToArtist) DESC)");
+            stmt.setInt(1, id);
+
+            ResultSet rs = stmt.executeQuery();
+            return resultSetToArtistList(rs);
+        } catch (SQLException ex) {
+            System.out.println("Database.java: Could not get artist recommendations.");
+            System.out.println(ex.toString());
+            return new ArrayList<>();
+        }
+    }
 }

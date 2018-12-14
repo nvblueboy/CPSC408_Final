@@ -182,7 +182,7 @@ public class Main {
                     makeRecommendation();
                     break;
                 case 2:
-
+                    getRecommendations();
                     break;
                 default: break;
             }
@@ -198,6 +198,17 @@ public class Main {
         int id2 = Input.getInt("What is the ID of the artist you'd like to recommend to?");
 
         Database.createArtistRec(id1, id2, userId);
+    }
+
+    public static void getRecommendations() {
+        checkForArtistId();
+        int id = Input.getInt("What is the ID of the artist you'd like to get recommendations for?");
+
+        ArrayList<Artist> artists = Database.getArtistRecs(id);
+
+        for(Artist a : artists) {
+            System.out.println(a.toString());
+        }
     }
 
     public static void checkForArtistId() {
